@@ -477,7 +477,8 @@
 <body>
     <div class="container" id="container">
         <div class="form-container sign-in">
-            <form onsubmit="handleLogin(event)">
+            <form action="{{ route('login.post') }}" method="POST">
+                @csrf
                 <div class="form-header">
                     <h1>Selamat Datang</h1>
                     <p>Silahkan login dengan akun anda</p>
