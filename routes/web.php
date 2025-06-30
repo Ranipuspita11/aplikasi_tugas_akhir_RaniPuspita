@@ -50,7 +50,7 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('hitung', [MaterialController::class, 'hitungWsmTotal'])->name('hitungWsmTotal');
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('export-pdf-data', [RabController::class, 'exportPdf'])->name('rab.exportPdf');
