@@ -13,6 +13,6 @@ class produk_suplier extends Model
     }
     public function material()
     {
-        return $this->hasOne(material::class, 'id', 'id_material');
+        return $this->hasOne(Material::class, 'id', 'id_material');
     }
 }
