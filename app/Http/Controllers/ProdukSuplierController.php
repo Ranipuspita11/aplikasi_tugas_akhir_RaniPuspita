@@ -26,20 +26,25 @@ class ProdukSuplierController extends Controller
     {
 
         if ($request->ajax()) {
-            $produk_suplier = produk_suplier::with('suplier')->latest()->get();
+            $produk_suplier = produk_suplier::with([
+                'suplier',
+                'material.merk',
+                'material.satuan'
+            ])->latest()->get();
+
 
             return DataTables::of($produk_suplier)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn ='';
+                    $btn = '';
                     if (Auth::user()->can('produk_suplier-list')) {
-                    $btn = '<a href="' . route('produk_suplier.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
-                     }
+                        $btn = '<a href="' . route('produk_suplier.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
+                    }
                     if (Auth::user()->can('produk_suplier-edit')) {
-                    $btn .= '<a href="' . route('produk_suplier.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';
+                        $btn .= '<a href="' . route('produk_suplier.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';
                     }
                     if (Auth::user()->can('produk_suplier-delete')) {
-                    $btn .= ' <form action="' . route('produk_suplier.destroy', $row->id) . '" method="POST" style="display:inline;">
+                        $btn .= ' <form action="' . route('produk_suplier.destroy', $row->id) . '" method="POST" style="display:inline;">
                                 ' . csrf_field() . '
                                 ' . method_field('DELETE') . '
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Yakin ingin menghapus?\')">Delete</button>
@@ -49,8 +54,11 @@ class ProdukSuplierController extends Controller
                 })->addColumn('id_suplier', function ($row) {
                     return $row->suplier->nama ?? "-";
                 })->addColumn('id_material', function ($row) {
-                    return $row->material->nama . " - " . $row->material->merk->nama . " - " . $row->material->satuan->nama;
+                    return optional($row->material)->nama . " - " .
+                        optional(optional($row->material)->merk)->nama . " - " .
+                        optional(optional($row->material)->satuan)->nama;
                 })
+
                 ->rawColumns(['action']) // Menandai kolom yang berisi HTML
                 ->make(true);
         }
