@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
-use App\Models\Produk_suplier;
+use App\Models\produk_suplier;
 use App\Models\Suplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +26,8 @@ class ProdukSuplierController extends Controller
     {
 
         if ($request->ajax()) {
-            $produk_suplier = Produk_suplier::latest()->get();
+            $produk_suplier = produk_suplier::with('suplier')->latest()->get();
+
             return DataTables::of($produk_suplier)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
