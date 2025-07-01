@@ -46,7 +46,7 @@ class ProdukSuplierController extends Controller
                     }
                     return $btn;
                 })->addColumn('id_suplier', function ($row) {
-                    return $row->suplier->nama;
+                    return $row->suplier->nama ?? "-";
                 })->addColumn('id_material', function ($row) {
                     return $row->material->nama . " - " . $row->material->merk->nama . " - " . $row->material->satuan->nama;
                 })
