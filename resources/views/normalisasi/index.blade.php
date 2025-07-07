@@ -45,14 +45,8 @@
             $('#normalisasiTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('normalisasi.index') }}",
+                ajax: "{{ route('normalisasis.index') }}",
                 columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
                         data: 'material',
                         name: 'material'
                     },

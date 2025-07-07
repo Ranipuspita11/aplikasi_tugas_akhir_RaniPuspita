@@ -4,9 +4,7 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">Daftar Merk</h4>
-            @can('merk - create')
-                
-         
+            @can('merk-create')     
             <a class="btn btn-primary btn-sm" href="{{ route('merk.create') }}">
                 <i class="fas fa-plus-circle"></i> Tambah Merk
             </a>
@@ -49,8 +47,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('merk.index') }}",
-                columns: [
-                    {
+                columns:[{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,

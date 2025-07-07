@@ -119,6 +119,25 @@
                             </div>
                         </div>
 
+                        <!-- Form Verifikasi dengan Tanggal -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-calendar-alt"></i> Informasi Verifikasi</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="tanggal_verifikasi" class="form-label">Tanggal Verifikasi</label>
+                                        <input type="date" class="form-control" id="tanggal_verifikasi" name="tanggal_verifikasi" value="{{ date('Y-m-d') }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="keterangan" class="form-label">Keterangan (Opsional)</label>
+                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan jika diperlukan..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Konfirmasi -->
                         <div class="alert alert-warning">
                             <div class="text-center mb-3">
@@ -136,6 +155,8 @@
                     </button>
                     <form id="verifikasiForm" method="POST" style="display: inline;">
                         @csrf
+                        <input type="hidden" name="tanggal_verifikasi" id="hiddenTanggalVerifikasi">
+                        <input type="hidden" name="keterangan" id="hiddenKeterangan">
                         <button type="submit" class="btn" id="confirmButton" disabled>
                             <i class="fas fa-check"></i> Konfirmasi
                         </button>
@@ -244,7 +265,7 @@
                         } else if (response.rab.status === 'not_verified') {
                             statusBadge.removeClass().addClass('badge bg-danger').text(
                                 'Ditolak');
-                        } else if (response.rab.verifikasi_sekretaris_by) {
+                        } else if (response.rab.verifikasi_by != null) {
                             statusBadge.removeClass().addClass('badge bg-warning').text(
                                 'Menunggu Admin');
                         } else {
@@ -303,6 +324,13 @@
                         console.error('Error loading RAB details:', error);
                     }
                 });
+            });
+
+            // Handler untuk form submission
+            $('#verifikasiForm').on('submit', function(e) {
+                // Copy values dari form ke hidden inputs
+                $('#hiddenTanggalVerifikasi').val($('#tanggal_verifikasi').val());
+                $('#hiddenKeterangan').val($('#keterangan').val());
             });
 
             // Function to format number with thousands separator

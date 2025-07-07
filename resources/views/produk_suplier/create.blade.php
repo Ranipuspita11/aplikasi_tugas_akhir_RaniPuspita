@@ -31,7 +31,7 @@
 
                                 <div class="form-group mb-3">
                                     <label for="id_suplier">Suplier</label>
-                                    <select name="id_suplier" class="form-control" id="id_suplier">
+                                    <select name="id_supliers" class="form-control" id="id_suplier">
                                         <option value="">-- Pilih Suplier --</option>
                                         @foreach ($supliers as $suplier)
                                             <option value="{{ $suplier->id }}">{{ $suplier->nama }}</option>

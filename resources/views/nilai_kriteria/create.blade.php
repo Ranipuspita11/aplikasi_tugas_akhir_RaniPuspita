@@ -26,7 +26,7 @@
                         @endif
 
                         <div class="card-body">
-                            <form action="{{ route('nilai_kriteria.store') }}" method="POST">
+                            <form action="{{ route('nilai_kriterias.store') }}" method="POST">
                                 @csrf
 
                                 <div class="form-group mb-3">
@@ -41,7 +41,7 @@
 
                                 <div class="form-group mb-3">
                                     <label for="id_kriteria">Kriteria</label>
-                                    <select name="id_kriteria" class="form-control" id="id_kriteria" required>
+                                    <select name="id_kriterias" class="form-control" id="id_kriteria" required>
                                         <option value="">-- Pilih Kriteria --</option>
                                         @foreach ($kriterias as $kriteria)
                                             <option value="{{ $kriteria->id }}">{{ $kriteria->nama }}</option>
@@ -51,8 +51,8 @@
 
                                 <div class="form-group mb-3">
                                     <label for="nilai">Nilai</label>
-                                    <input type="number" name="nilai" id="nilai" class="form-control" 
-                                           placeholder="Masukkan Nilai" step="0.01" required>
+                                    <input type="number" name="nilai" id="nilai" class="form-control"
+                                        placeholder="Masukkan Nilai" step="0.01" required>
                                 </div>
 
                                 <div class="form-group">

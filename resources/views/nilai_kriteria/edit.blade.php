@@ -29,17 +29,20 @@
 
                             <div class="mb-3">
                                 <label for="id_material" class="form-label">Material</label>
-                                <input type="text" name="id_material" value="{{ $nilai_kriteria->id_material }}" class="form-control" id="id_material" placeholder="Masukkan ID Material">
+                                <input type="text" name="id_materials" value="{{ $nilai_kriteria->id_material }}"
+                                    class="form-control" id="id_material" placeholder="Masukkan ID Material">
                             </div>
 
                             <div class="mb-3">
                                 <label for="id_kriteria" class="form-label">Kriteria</label>
-                                <input type="text" name="id_kriteria" value="{{ $nilai_kriteria->id_kriteria }}" class="form-control" id="id_kriteria" placeholder="Masukkan ID Kriteria">
+                                <input type="text" name="id_kriteria" value="{{ $nilai_kriteria->id_kriteria }}"
+                                    class="form-control" id="id_kriteria" placeholder="Masukkan ID Kriteria">
                             </div>
 
                             <div class="mb-3">
                                 <label for="nilai" class="form-label">Nilai</label>
-                                <input type="text" name="nilai" value="{{ $nilai_kriteria->nilai }}" class="form-control" id="nilai" placeholder="Masukkan Nilai">
+                                <input type="text" name="nilai" value="{{ $nilai_kriteria->nilai }}"
+                                    class="form-control" id="nilai" placeholder="Masukkan Nilai">
                             </div>
 
                             <div class="d-grid">

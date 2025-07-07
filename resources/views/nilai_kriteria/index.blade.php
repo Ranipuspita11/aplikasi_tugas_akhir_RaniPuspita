@@ -46,14 +46,8 @@
             $('#nilai_kriteriaTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('nilai_kriteria.index') }}",
+                ajax: "{{ route('nilai_kriterias.index') }}",
                 columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
                         data: 'material',
                         name: 'material'
                     },

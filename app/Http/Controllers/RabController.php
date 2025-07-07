@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
 use App\Models\Rab;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\CssSelector\Parser\Handler\WhitespaceHandler;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
-
+use Carbon\Carbon; // Pastikan ini ada
 
 class RabController extends Controller
 {
@@ -43,7 +44,7 @@ class RabController extends Controller
                         $btn .= '<div class="btn-group mb-1" role="group">';
                         $btn .= '<button type="button" class="btn btn-success btn-sm btn-verifikasi" data-bs-toggle="modal" data-bs-target="#verifikasiModal" data-id="' . $row->id . '" data-role="Admin" data-action="verified">
                         <i class="fas fa-check"></i> Setujui </button>';
-                        $btn .= '<button type="button" class="btn btn-danger btn-sm btn-verifikasi" data-bs-toggle="modal" data-bs-target="#verifikasiModal" data-id="' . $row->id . '" data-role="Admin" data-action="not_verified">
+                        $btn .= '<button type="button" class="btn btn-danger btn-sm btn-verifikasi" data-bs-toggle="modal" data-bs-target="#verifikasiModal" data-id="' . $row->id . '" data-action="not_verified">
                         <i class="fas fa-times"></i> Tolak </button>';
                         $btn .= '</div>';
                     }
@@ -64,34 +65,33 @@ class RabController extends Controller
 
                     // Tombol Show
                     $btn .= '<a href="' . route('rab.show', $row->id) . '" class="btn btn-info btn-sm">
-        <i class="fas fa-eye"></i> Show
-    </a>';
-
+                        <i class="fas fa-eye"></i> Show
+                    </a>';
 
                     // Tombol Edit (Admin bisa edit kapanpun)
                     $btn .= '<a href="' . route('rab.edit', $row->id) . '" class="btn btn-primary btn-sm">
-        <i class="fas fa-edit"></i> Edit
-    </a>';
+                        <i class="fas fa-edit"></i> Edit
+                    </a>';
 
-   $btn .= '<a href="' . route('cetak_rab', $row->id) . '" class="btn btn-success btn-sm">
-    <i class="fas fa-print"></i> Cetak
-</a>';
-
+                   // Tombol Cetak - Hanya bisa diakses oleh Pimpinan
+                    if ($user->hasRole('Pimpinan')) { // <--- Penambahan kondisi ini
+                        $btn .= '<a href="' . route('cetak_rab', $row->id) . '" class="btn btn-success btn-sm">
+                            <i class="fas fa-print"></i> Cetak
+                        </a>';
+                    }
 
                     // Tombol Delete (Admin bisa hapus kapanpun)
                     $btn .= '<form action="' . route('rab.destroy', $row->id) . '" method="POST" style="display:inline;">
-        ' . csrf_field() . '
-        ' . method_field('DELETE') . '
-        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Yakin ingin menghapus?\')">
-            <i class="fas fa-trash"></i> Delete
-        </button>
-    </form>';
-
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Yakin ingin menghapus?\')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>';
                     $btn .= '</div>';
 
                     return $btn;
-                })
-
+    })
                 ->rawColumns(['action']) // Menandai kolom yang berisi HTML
                 ->make(true);
         }
@@ -113,11 +113,13 @@ class RabController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+
             'nama' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
 
         ]);
+
         Rab::create($request->all());
         return redirect()->route('rab.index')
             ->with('success', 'rab created successfully.');
@@ -147,6 +149,7 @@ class RabController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+
             'nama' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
@@ -161,51 +164,60 @@ class RabController extends Controller
 
     public function verifikasi_berkas_verified(Request $request, $id)
     {
-        $rab = Rab::where('id', '=', $id)->first();
-        $user = Auth::user();
-        $roles = $user->getRoleNames(); // return Collection'
-        // dd($rab);
+        // Validasi input
+        $request->validate([
+            'tanggal_verifikasi' => 'required|date',
+            'keterangan' => 'nullable|string|max:500'
+        ]);
 
-        if (Auth::user()->hasRole('Admin')) {
-            $rab->update([
-                'status' => 'verified',
-                'verifikasi_at' => now(),
-                'verifikasi_by' => Auth::user()->id
-            ]);
-        } elseif (Auth::user()->hasRole('Admin')) {
-            $rab->update([
-                'status' => 'verified',
-                'verifikasi_at' => now(),
-                'verifikasi_by' => Auth::user()->id
-            ]);
-        }
-
-        return redirect()->route('rab.index')
-            ->with('success', 'Rab berhasil diverifikasi');
-    }
-
-    public function verifikasi_berkas_notverified(Request $request, $id)
-    {
         $rab = Rab::where('id', '=', $id)->first();
         $user = Auth::user();
         $roles = $user->getRoleNames(); // return Collection
 
-        // Hanya Bendahara yang bisa melakukan not_verified
-    // if (Auth::user()->hasRole('Bendahara')) {
+        if (Auth::user()->hasRole('Admin')) {
+            $rab->update([
+                'status' => 'verified',
+                'verifikasi_at' => $request->tanggal_verifikasi, // Gunakan tanggal dari form
+                'verifikasi_by' => Auth::user()->id,
+                'keterangan_verifikasi' => $request->keterangan // Simpan keterangan
+            ]);
+        } elseif (Auth::user()->hasRole('Admin')) {
+            $rab->update([
+                'status' => 'verified',
+                'verifikasi_at' => $request->tanggal_verifikasi,
+                'verifikasi_by' => Auth::user()->id,
+                'keterangan_verifikasi' => $request->keterangan
+            ]);
+        }
+
+        return redirect()->route('rab.index')
+            ->with('success', 'RAB berhasil diverifikasi pada tanggal ' . date('d/m/Y', strtotime($request->tanggal_verifikasi)));
+    }
+
+    public function verifikasi_berkas_notverified(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'tanggal_verifikasi' => 'required|date',
+            'keterangan' => 'nullable|string|max:500'
+        ]);
+
+        $rab = Rab::where('id', '=', $id)->first();
+        $user = Auth::user();
+        $roles = $user->getRoleNames(); // return Collection
+
+        // Hanya Admin yang bisa melakukan not_verified
         $rab->update([
             'status' => 'not_verified',
-            'verifikasi_at' => now(),
-            'verifikasi_by' => $roles[0]
+            'verifikasi_at' => $request->tanggal_verifikasi, // Gunakan tanggal dari form
+            'verifikasi_by' => Auth::user()->id,
+            'keterangan_verifikasi' => $request->keterangan // Simpan keterangan
         ]);
 
         return redirect()->route('rab.index')
-            ->with('success', 'Rab ditolak verifikasi');
-        // } else {
-        //     // Jika bukan Bendahara, redirect dengan pesan error
-        //     return redirect()->route('rab.index')
-        //         ->with('error', 'Anda tidak memiliki hak akses untuk menolak verifikasi');
-        // }
+            ->with('success', 'RAB ditolak verifikasi pada tanggal ' . date('d/m/Y', strtotime($request->tanggal_verifikasi)));
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -236,11 +248,13 @@ class RabController extends Controller
                 ->leftJoin('satuans', 'materials.id_satuan', '=', 'satuans.id')
                 ->leftJoin('supliers', 'rab_details.id_supplier_terpilih', '=', 'supliers.id')
                 ->select(
+                    
                     'rab_details.*',
                     'materials.nama as material_nama',
-                    // Removed 'materials.spesifikasi as material_spesifikasi' since the column doesn't exist
+                    
                     'satuans.nama as satuan_nama',
                     'supliers.nama as supplier_nama'
+
                 )
                 ->where('rab_details.id_rab', $id)
                 ->get();
@@ -258,32 +272,55 @@ class RabController extends Controller
         }
     }
 
-
-    public function exportPdf()
+    // Fungsi untuk mengekspor SEMUA RAB
+  public function exportPdf()
     {
-        $rabs = Rab::with('details.material')->get();
+        // Memuat relasi dengan benar
+        $rabs = Rab::with([
+            'details.material.satuan',
+            'details.material.merk',
+            'details.kegiatan',
+            'details.suplier'
+        ])->get();
 
-        return view('rab.export-pdf', compact('rabs'));
+        $tanggalCetak = Carbon::now()->locale('id')->isoFormat('D MMMM Y');
+
+        $pdf = Pdf::loadView('rab.export-pdf', compact('rabs', 'tanggalCetak'));
+
+        return $pdf->download('daftar_rab_' . Carbon::now()->format('YmdHis') . '.pdf');
     }
 
-    public function cetak($id){
-        $rab = Rab::with('details.material', 'details.Suplier')->findOrFail($id);
-        $kegiatan = Kegiatan::all();
-        // dd($kegiatan);
-
-
-        // Hitung total keseluruhan
-        $totalKeseluruhan = 0;
+    public function cetak($id)
+    {
+        // Memuat relasi dengan benar
+        $rab = Rab::with([
+            'details.material.satuan',
+            'details.material.merk',
+            'details.kegiatan',
+            'details.suplier'
+        ])->findOrFail($id);
+// dd($rab->toArray());
+        // Jika kolom 'total_harga' di tabel 'rabs' kosong/nol,
+        // dan Anda ingin menghitung ulang dari details, lakukan ini:
+        // Ini akan menimpa $rab->total_harga yang mungkin nol dari DB.
+        $rab->total_harga = 0; // Reset atau pastikan properti ini ada
         foreach ($rab->details as $detail) {
-            // dd($detail->qty);
-            $qty = (int) $detail->qty ?? 0;
-            $harga = (int) $detail->harga_terpilih ?? 0;
-            $total = $qty * $harga;
-            $totalKeseluruhan += $total;
+            // Pastikan casting ke float untuk perhitungan yang akurat
+            $qty = (float) $detail->qty;
+            $harga = (float) $detail->harga_terpilih;
+            $subtotal_detail = $qty * $harga; // Hitung subtotal untuk detail ini
+            $detail->subtotal = $subtotal_detail; // Tambahkan/timpa properti subtotal di objek detail sementara
+            $rab->total_harga += $subtotal_detail; // Akumulasikan ke total harga RAB
         }
 
-        $pdf = Pdf::loadView('rab.pdf', compact('rab', 'totalKeseluruhan','kegiatan'));
+        $tanggalCetak = Carbon::now()->locale('id')->isoFormat('D MMMM Y');
 
-        return $pdf->download('rab_'.$rab->id.'.pdf');
+        // Bungkus $rab tunggal ke dalam koleksi untuk konsistensi dengan view export-pdf
+        // $rab ini sekarang sudah memiliki $rab->total_harga dan $detail->subtotal yang terhitung
+        $rabs = collect([$rab]);
+
+        $pdf = Pdf::loadView('rab.export-pdf', compact('rabs', 'tanggalCetak'));
+
+        return $pdf->download('rab_' . $rab->nama . '_' . Carbon::now()->format('YmdHis') . '.pdf');
     }
 }

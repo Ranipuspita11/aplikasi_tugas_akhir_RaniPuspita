@@ -112,8 +112,9 @@ class MaterialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Material $material)
+    public function show($id)
     {
+        $material = Material::where('id', '=', $id)->first();
         return view('material.show', compact('material'));
     }
 

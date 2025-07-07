@@ -30,7 +30,7 @@ class MerkController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '';
                     if (Auth::user()->can('merk-list')) {
-                    $btn = '<a href="'. route('merk.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
+                    $btn = '<a href="'. route('merk.show' , $row->id). '" class="btn btn-warning btn-sm">Show </a>';
                     }
                     if (Auth::user()->can('merk-edit')) {
                     $btn .= '<a href="' . route('merk.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';

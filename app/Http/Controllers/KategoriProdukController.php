@@ -34,7 +34,7 @@ class KategoriProdukController extends Controller
 
                     $btn = '';
                     if (Auth::user()->can('kategori_produk-list')) {
-                    $btn = '<a href="'. route('kategori_produk.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
+                    $btn = '<a href="'. route('kategori_produk.show' , $row->id ).'" class="btn btn-warning btn-sm">Show </a>';
                     }
                     if (Auth::user()->can('material-edit')) {
                     $btn .= '<a href="' . route('kategori_produk.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';

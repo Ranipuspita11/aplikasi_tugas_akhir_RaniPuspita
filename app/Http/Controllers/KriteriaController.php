@@ -32,12 +32,12 @@ class KriteriaController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '';
 
-                    if (Auth ::user()->can('kriteria-list')) {
+                    if (Auth ::user()->can('kriterias-list')) {
                     $btn = '<a href="'. route('kriteria.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
                     }
 
                     if (Auth::user()->can('kriteria-edit')) {
-                    $btn .= '<a href="' . route('kriteria.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';
+                    $btn .= '<a href="' . route('kriteria.edit') . '" class="btn btn-primary btn-sm">Edit</a>';
                     }
                     if (Auth::user()->can('kriteria-delete')) {
                     $btn .= ' <form action="' . route('kriteria.destroy', $row->id) . '" method="POST" style="display:inline;">

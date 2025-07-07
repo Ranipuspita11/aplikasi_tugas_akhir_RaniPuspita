@@ -24,7 +24,7 @@
 
                         <div class="mb-3">
                             <h6 class="fw-bold">Nilai Normalisasi:</h6>
-                            <p>{{ $normalisasi->nilai_normalisasi }}</p>
+                            <p>{{ $normalisasi->nilai_normalisasis }}</p>
                         </div>
 
                     </div>
