@@ -105,7 +105,7 @@ class MaterialController extends Controller
         $path = $image->storeAs('material', $filename, 'public');
 
         // Pastikan kolom foto di DB menyimpan path relatif dari public storage
-        $input['foto'] = 'material/' . $filename;
+        $input['foto'] = $filename;
 
         Material::create($input);
 
