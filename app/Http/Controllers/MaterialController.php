@@ -36,23 +36,23 @@ class MaterialController extends Controller
                     return '<img src="' . $url . '" width="50px" height="50px" alt="Material Image">';
                 })
                 ->addColumn('action', function ($row) {
-                $btn = '';
+                    $btn = '';
 
-                if (Auth::user()->can('material-list')) {
-                    $btn = '<a href="' . route('material.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
-                }
+                    if (Auth::user()->can('material-list')) {
+                        $btn = '<a href="' . route('material.show', $row->id) . '" class="btn btn-warning btn-sm">Show </a>';
+                    }
 
-                if (Auth::user()->can('material-edit')) {
-                    $btn .= '<a href="' . route('material.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';
-                }
+                    if (Auth::user()->can('material-edit')) {
+                        $btn .= '<a href="' . route('material.edit', $row->id) . '" class="btn btn-primary btn-sm">Edit</a>';
+                    }
 
-                if (Auth::user()->can('material-delete')) {
-                    $btn .= ' <form action="' . route('material.destroy', $row->id) . '" method="POST" style="display:inline;">
+                    if (Auth::user()->can('material-delete')) {
+                        $btn .= ' <form action="' . route('material.destroy', $row->id) . '" method="POST" style="display:inline;">
                             ' . csrf_field() . '
                             ' . method_field('DELETE') . '
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Yakin ingin menghapus?\')">Delete</button>
                           </form>';
-                }
+                    }
 
                     return $btn;
                     // })->addColumn('suplier', function ($row) {
@@ -95,19 +95,24 @@ class MaterialController extends Controller
             'id_kategori_produk' => 'required',
             'id_satuan' => 'required',
             'foto' => 'required|mimes:jpeg,png,jpg,gif|max:2048',
-
         ]);
 
         $input = $request->all();
+
+        // Simpan ke storage/app/public/material
         $image = $request->file('foto');
         $filename = time() . '_' . $request->nama . '.' . $image->getClientOriginalExtension();
-        $path = $image->storeAs('material', $filename);
-        $input['foto'] = $filename;
-        $material = Material::create($input);
-        // dd($material);
+        $path = $image->storeAs('material', $filename, 'public');
+
+        // Pastikan kolom foto di DB menyimpan path relatif dari public storage
+        $input['foto'] = 'material/' . $filename;
+
+        Material::create($input);
+
         return redirect()->route('material.index')
             ->with('success', 'Material created successfully.');
     }
+
 
     /**
      * Display the specified resource.
